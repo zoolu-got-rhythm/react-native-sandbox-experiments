@@ -10,6 +10,8 @@ import React from 'react';
 import {Component} from 'react';  
 import {Platform, StyleSheet, Text, View} from 'react-native';
 import { Hello } from './components/Hello';
+import hexGenerator from './utils/hexGenerator';
+import { Image } from 'react-native'
 
 const instructions = Platform.select({
   ios: 'Press Cmd+R to reload,\n' + 'Cmd+D or shake for dev menu',
@@ -18,14 +20,45 @@ const instructions = Platform.select({
     'Shake or press menu button for dev menu',
 });
 
-type Props = {};
-export default class App extends Component<Props> {
+interface Props {};
+
+
+interface State {
+  backgroundColour: string; 
+}; 
+
+export default class App extends Component<Props, State> {
+
+  constructor(props: Props){
+    super(props); 
+
+    this.state = {
+      backgroundColour: hexGenerator()
+    }
+  }
+
+  componentDidMount(){
+    window.setInterval(()=>{
+      this.setState({backgroundColour: hexGenerator()}); 
+    }, 200)
+  }
+
   render() {
+
+    const containerStyles: object = {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      height: 100,
+      backgroundColor: this.state.backgroundColour,
+    }
+
     return (
-      <View style={styles.container}>
-        <Text style={styles.welcome}>Welcome to React Native!</Text>
+      <View style={containerStyles}>
+        {/* <Text style={styles.welcome}>Welcome to React Native!</Text>
         <Text style={styles.instructions}>To get started, edit App.js</Text>
-        <Text style={styles.instructions}>{instructions}</Text>
+        <Text style={styles.instructions}>{instructions}</Text> */}
+        <Image source={require("./kisspng-cat.jpg")} style={{width: 100, height: 100}}/>
         <Hello name="world" enthusiasmLevel={5}/>
       </View>
     );
@@ -37,10 +70,9 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#F5FCFF',
+    backgroundColor: 'purple',
   },
   welcome: {
-    fontSize: 20,
     textAlign: 'center',
     margin: 10,
   },

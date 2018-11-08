@@ -70,7 +70,7 @@ const styles = StyleSheet.create({
   },
   buttons: {
     flexDirection: "row",
-    minHeight: 70,
+    // minHeight: 100,
     alignItems: "stretch",
     alignSelf: "center",
     borderWidth: 5
@@ -80,6 +80,7 @@ const styles = StyleSheet.create({
     paddingVertical: 0
   },
   greeting: {
+    fontSize: 50,
     color: "#999",
     fontWeight: "bold"
   }
