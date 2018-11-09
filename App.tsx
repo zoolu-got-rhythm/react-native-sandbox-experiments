@@ -12,6 +12,7 @@ import {Platform, StyleSheet, Text, View, Dimensions} from 'react-native';
 import { Hello } from './components/Hello';
 import hexGenerator from './utils/hexGenerator';
 import { Image } from 'react-native'
+import { TextInputComponent } from './components/TextInputComponent';
 
 const instructions = Platform.select({
   ios: 'Press Cmd+R to reload,\n' + 'Cmd+D or shake for dev menu',
@@ -57,6 +58,8 @@ export default class App extends Component<Props, State> {
       <View style={{flex: 1, flexDirection: 'column', 
       justifyContent: "flex-start", borderWidth: 5, borderColor: "red", maxHeight: 200, 
       alignItems: "stretch"}}>
+
+        <TextInputComponent />
         <View style={{flex: 2, margin: 5, borderRadius: 5, backgroundColor: 'powderblue'}} />
         <View style={{width: Dimensions.get("window").width / 2, flex: 8, backgroundColor: 'skyblue'}} />
         <View style={{width: 50, flex: 2, backgroundColor: 'steelblue'}} />
