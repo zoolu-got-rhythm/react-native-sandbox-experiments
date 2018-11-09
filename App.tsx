@@ -54,12 +54,19 @@ export default class App extends Component<Props, State> {
     }
 
     return (
-      <View style={containerStyles}>
-        {/* <Text style={styles.welcome}>Welcome to React Native!</Text>
-        <Text style={styles.instructions}>To get started, edit App.js</Text>
-        <Text style={styles.instructions}>{instructions}</Text> */}
-        <Image source={require("./kisspng-cat.jpg")} style={{width: 100, height: 100}}/>
-        <Hello name="world" enthusiasmLevel={5}/>
+      <View style={{flex: 1, flexDirection: 'column'}}>
+        <View style={{width: 50, height: 100, backgroundColor: 'powderblue'}} />
+        <View style={{width: 50, height: 50, backgroundColor: 'skyblue'}} />
+        <View style={{width: 50, height: 50, backgroundColor: 'steelblue'}} />
+        <View style={{width: 50, height: 50, backgroundColor: 'powderblue'}} />
+        <View style={{width: 50, height: 50, backgroundColor: 'red'}} />
+        <View style={{width: 50, height: 50, backgroundColor: 'steelblue'}} />
+        <View style={{width: 50, height: 50, backgroundColor: 'green'}} />
+        <View style={{width: 50, height: 50, backgroundColor: 'blue'}} />
+        <View style={{width: 50, height: 50, backgroundColor: 'green'}} />
+        <View style={{width: 50, height: 50, backgroundColor: 'blue'}} />
+        <Text> hello </Text>
+        {/* <View style={{width: 50, height: 50, backgroundColor: 'steelblue'}} /> */}
       </View>
     );
   }
