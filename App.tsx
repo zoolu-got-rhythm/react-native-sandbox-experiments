@@ -8,7 +8,7 @@
 
 import React from 'react';
 import {Component} from 'react';  
-import {Platform, StyleSheet, Text, View} from 'react-native';
+import {Platform, StyleSheet, Text, View, Dimensions} from 'react-native';
 import { Hello } from './components/Hello';
 import hexGenerator from './utils/hexGenerator';
 import { Image } from 'react-native'
@@ -54,17 +54,13 @@ export default class App extends Component<Props, State> {
     }
 
     return (
-      <View style={{flex: 1, flexDirection: 'column'}}>
-        <View style={{width: 50, height: 100, backgroundColor: 'powderblue'}} />
-        <View style={{width: 50, height: 50, backgroundColor: 'skyblue'}} />
-        <View style={{width: 50, height: 50, backgroundColor: 'steelblue'}} />
-        <View style={{width: 50, height: 50, backgroundColor: 'powderblue'}} />
-        <View style={{width: 50, height: 50, backgroundColor: 'red'}} />
-        <View style={{width: 50, height: 50, backgroundColor: 'steelblue'}} />
-        <View style={{width: 50, height: 50, backgroundColor: 'green'}} />
-        <View style={{width: 50, height: 50, backgroundColor: 'blue'}} />
-        <View style={{width: 50, height: 50, backgroundColor: 'green'}} />
-        <View style={{width: 50, height: 50, backgroundColor: 'blue'}} />
+      <View style={{flex: 1, flexDirection: 'column', 
+      justifyContent: "flex-start", borderWidth: 5, borderColor: "red", maxHeight: 200, 
+      alignItems: "stretch"}}>
+        <View style={{flex: 2, margin: 5, borderRadius: 5, backgroundColor: 'powderblue'}} />
+        <View style={{width: Dimensions.get("window").width / 2, flex: 8, backgroundColor: 'skyblue'}} />
+        <View style={{width: 50, flex: 2, backgroundColor: 'steelblue'}} />
+       
         <Text> hello </Text>
         {/* <View style={{width: 50, height: 50, backgroundColor: 'steelblue'}} /> */}
       </View>
