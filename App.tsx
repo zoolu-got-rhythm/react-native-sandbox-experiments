@@ -8,7 +8,7 @@
 
 import React from 'react';
 import {Component} from 'react';  
-import {Platform, StyleSheet, Text, View, Dimensions} from 'react-native';
+import {Platform, StyleSheet, Text, View, Dimensions, TouchableNativeFeedback, RippleBackgroundPropType, ThemeAttributeBackgroundPropType, Alert, GestureResponderEvent, ScrollView} from 'react-native';
 import { Hello } from './components/Hello';
 import hexGenerator from './utils/hexGenerator';
 import { Image } from 'react-native'
@@ -28,6 +28,8 @@ interface State {
   backgroundColour: string; 
 }; 
 
+type androidNativeButton = RippleBackgroundPropType | ThemeAttributeBackgroundPropType | undefined; 
+
 export default class App extends Component<Props, State> {
 
   constructor(props: Props){
@@ -38,6 +40,16 @@ export default class App extends Component<Props, State> {
     }
   }
 
+  private _onPressButton(e: GestureResponderEvent) {
+    Alert.alert("you tapped on button"); 
+  }
+
+  private _onLongPressButton(e: GestureResponderEvent){
+    Alert.alert("you long-pressed a button"); 
+  }
+
+  
+
   componentDidMount(){
     window.setInterval(()=>{
       this.setState({backgroundColour: hexGenerator()}); 
@@ -46,26 +58,51 @@ export default class App extends Component<Props, State> {
 
   render() {
 
-    const containerStyles: object = {
-      flex: 1,
-      justifyContent: 'center',
-      alignItems: 'center',
-      height: 100,
-      backgroundColor: this.state.backgroundColour,
-    }
+    // const containerStyles: object = {
+    //   flex: 1,
+    //   justifyContent: 'center',
+    //   alignItems: 'center',
+    //   height: 100,
+    //   backgroundColor: this.state.backgroundColour,
+    // }
 
     return (
       <View style={{flex: 1, flexDirection: 'column', 
-      justifyContent: "flex-start", borderWidth: 5, borderColor: "red", maxHeight: 200, 
+      justifyContent: "flex-start", borderWidth: 5, borderColor: "purple",  
       alignItems: "stretch"}}>
 
         <TextInputComponent />
-        <View style={{flex: 2, margin: 5, borderRadius: 5, backgroundColor: 'powderblue'}} />
-        <View style={{width: Dimensions.get("window").width / 2, flex: 8, backgroundColor: 'skyblue'}} />
+        <View style={{height:80, margin: 5, borderRadius: 5, backgroundColor: this.state.backgroundColour}} />
+        <View style={{width: Dimensions.get("window").width / 2, height: 20, flex: 8, backgroundColor: 'skyblue'}} />
         <View style={{width: 50, flex: 2, backgroundColor: 'steelblue'}} />
+
+
+        <ScrollView pagingEnabled={true} style={{height:200, borderWidth: 5}}> 
+          <Text> hello </Text>       
+          <Text> hello </Text>
+          <Text> hello </Text>
+          <Text> hello </Text>
+          <Text> hello </Text>
+          <Text> hello </Text>
+          <Text> hello </Text>
+          <Text> hello </Text>
+          <Text> hello </Text>
+          <Text> hello </Text>
+          <Text> hello </Text>
+          <Text> hello </Text>
+          <Text> hello </Text>
+        </ScrollView>
        
-        <Text> hello </Text>
         {/* <View style={{width: 50, height: 50, backgroundColor: 'steelblue'}} /> */}
+
+        <TouchableNativeFeedback
+            onPress={this._onPressButton}
+            onLongPress={this._onLongPressButton}
+            background={(Platform.OS === 'android' ? TouchableNativeFeedback.SelectableBackground() : '') as androidNativeButton}>
+          <View style={styles.button}>
+            <Text style={styles.buttonText}>TouchableNativeFeedback</Text>
+          </View>
+        </TouchableNativeFeedback>
       </View>
     );
   }
@@ -87,4 +124,15 @@ const styles = StyleSheet.create({
     color: '#333333',
     marginBottom: 5,
   },
+  button: {
+    width:90,
+    borderBottomWidth:5,
+    borderRadius: 20,
+    alignItems: 'center',
+    backgroundColor: '#2196F3'
+  },
+  buttonText: {
+    padding: 20,
+    color: 'white'
+  }
 });
