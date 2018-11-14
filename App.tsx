@@ -1,3 +1,6 @@
+import { Platform, View } from "react-native";
+import { Component } from "react";
+
 /**
  * Sample React Native App
  * https://github.com/facebook/react-native
@@ -6,13 +9,12 @@
  * @flow
  */
 
-import {Platform, StyleSheet, Text, View, Dimensions, TouchableNativeFeedback, RippleBackgroundPropType, ThemeAttributeBackgroundPropType, Alert, GestureResponderEvent, ScrollView, FlatList, SectionList} from 'react-native';
-import { Hello } from './components/Hello';
-import hexGenerator from './utils/hexGenerator';
-import { Image } from 'react-native'
-import { TextInputComponent } from './components/TextInputComponent';
-import getFacebookMoviesApiRequest, { marshalledMoviesObjectShape, MovieDataSectionsByLetter } from './utils/getFacebookMoviesApiRequest';
-import { Component } from 'react';
+// import {Platform, StyleSheet, Text, View, Dimensions, TouchableNativeFeedback, RippleBackgroundPropType, ThemeAttributeBackgroundPropType, Alert, GestureResponderEvent, ScrollView, FlatList, SectionList} from 'react-native';
+// import { Hello } from './components/Hello';
+// import hexGenerator from './utils/hexGenerator';
+// import { Image } from 'react-native'
+// import { TextInputComponent } from './components/TextInputComponent';
+// import getFacebookMoviesApiRequest, { marshalledMoviesObjectShape, MovieDataSectionsByLetter } from './utils/getFacebookMoviesApiRequest';
 
 const instructions = Platform.select({
   ios: 'Press Cmd+R to reload,\n' + 'Cmd+D or shake for dev menu',
