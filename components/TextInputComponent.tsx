@@ -53,5 +53,4 @@ export interface Props {
     textInputInfo: {
 
     }
-
   })

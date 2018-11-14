@@ -6,13 +6,13 @@
  * @flow
  */
 
-import React from 'react';
-import {Component} from 'react';  
 import {Platform, StyleSheet, Text, View, Dimensions, TouchableNativeFeedback, RippleBackgroundPropType, ThemeAttributeBackgroundPropType, Alert, GestureResponderEvent, ScrollView, FlatList, SectionList} from 'react-native';
 import { Hello } from './components/Hello';
 import hexGenerator from './utils/hexGenerator';
 import { Image } from 'react-native'
 import { TextInputComponent } from './components/TextInputComponent';
+import getFacebookMoviesApiRequest, { marshalledMoviesObjectShape, MovieDataSectionsByLetter } from './utils/getFacebookMoviesApiRequest';
+import { Component } from 'react';
 
 const instructions = Platform.select({
   ios: 'Press Cmd+R to reload,\n' + 'Cmd+D or shake for dev menu',
@@ -24,21 +24,26 @@ const instructions = Platform.select({
 interface Props {};
 
 
+interface movieSectionsShapeForSectionList{
+  title: string, 
+  data: marshalledMoviesObjectShape[]
+}
+
 interface State {
   backgroundColour: string; 
-  movies: string[]
+  movieSections: movieSectionsShapeForSectionList[]; 
 }; 
 
-function getMoviesFromApiAsync() {
-  return fetch('https://facebook.github.io/react-native/movies.json')
-    .then((response) => response.json())
-    .then((responseJson) => {
-      return responseJson.movies;
-    })
-    .catch((error) => {
-      console.error(error);
-    });
-}
+// function getMoviesFromApiAsync() {
+//   return fetch('https://facebook.github.io/react-native/movies.json')
+//     .then((response) => response.json())
+//     .then((responseJson) => {
+//       return responseJson.movies;
+//     })
+//     .catch((error) => {
+//       console.error(error);
+//     });
+// }
 
 type androidNativeButton = RippleBackgroundPropType | ThemeAttributeBackgroundPropType | undefined; 
 
@@ -49,7 +54,7 @@ export default class App extends Component<Props, State> {
 
     this.state = {
       backgroundColour: hexGenerator(),
-      movies: []
+      movieSections: []
     }
   }
 
@@ -64,7 +69,28 @@ export default class App extends Component<Props, State> {
   
 
   componentDidMount(){
-    getMoviesFromApiAsync(); 
+    // getMoviesFromApiAsync(); 
+    getFacebookMoviesApiRequest((moviesDataObjectGroupingArrOfObjectsByLetter: MovieDataSectionsByLetter)=>{
+      
+      let sectionsListDataArr: movieSectionsShapeForSectionList[] = []; 
+
+      for(let prop in moviesDataObjectGroupingArrOfObjectsByLetter){
+        sectionsListDataArr.push({
+          title: prop,
+          data: (moviesDataObjectGroupingArrOfObjectsByLetter[prop] as marshalledMoviesObjectShape[])
+        })
+      }
+
+      console.log("api data for SectionsList"); 
+      console.log(sectionsListDataArr)
+
+      this.setState(
+        {
+          movieSections: sectionsListDataArr
+        }
+      )
+    }); 
+
     window.setInterval(()=>{
       this.setState({backgroundColour: hexGenerator()}); 
     }, 200)
@@ -85,64 +111,20 @@ export default class App extends Component<Props, State> {
       justifyContent: "flex-start", borderWidth: 5, borderColor: "purple",  
       alignItems: "stretch"}}>
 
-        <TextInputComponent />
-        <View style={{height:80, margin: 5, borderRadius: 5, backgroundColor: this.state.backgroundColour}} />
-        <View style={{width: Dimensions.get("window").width / 2, height: 20, flex: 8, backgroundColor: 'skyblue'}} />
-        <View style={{width: 50, flex: 2, backgroundColor: 'steelblue'}} />
+      <Text> my facebook movies list </Text>
 
-
-        <ScrollView pagingEnabled={true} style={{height:50, borderWidth: 5}}> 
-          <Text> hello </Text>       
-          <Text> hello </Text>
-          <Text> hello </Text>
-          <Text> hello </Text>
-          <Text> hello </Text>
-          <Text> hello </Text>
-          <Text> hello </Text>
-          <Text> hello </Text>
-          <Text> hello </Text>
-          <Text> hello </Text>
-          <Text> hello </Text>
-          <Text> hello </Text>
-          <Text> hello </Text>
-        </ScrollView>
-       
-        {/* <View style={{width: 50, height: 50, backgroundColor: 'steelblue'}} /> */}
-
-        <SectionList style={{height: 50}}
-          sections={[
+      {/* [
             {title: 'D', data: ['Devin']},
             {title: 'J', data: ['Jackson', 'James', 'Jillian', 'Jimmy', 'Joel', 'John', 'Julie']},
-          ]}
-          renderItem={({item}) => <Text style={styles.item}>{item}</Text>}
+          ] */}
+
+        {/* <SectionList style={{height: 50}}
+          sections={this.state.movieSections}
+          renderItem={({item}) => <Text style={styles.item}>{item.title}</Text>}
           renderSectionHeader={({section}) => <Text style={styles.sectionHeader}>{section.title}</Text>}
           keyExtractor={(item: any, index: number) => index.toString()}
-        />
+        /> */}
 
-        <View style={{flex: 4, flexDirection: "row", borderColor: "green", borderWidth: 4}}>  
-          <TouchableNativeFeedback
-              onPress={this._onPressButton}
-              onLongPress={this._onLongPressButton}
-              background={(Platform.OS === 'android' ? TouchableNativeFeedback.SelectableBackground() : '') as androidNativeButton}>
-            <View style={styles.button}>
-              <Text style={styles.buttonText}>TouchableNativeFeedback</Text>
-            </View>
-          </TouchableNativeFeedback>
-
-          <FlatList style={{ borderWidth: 5}}
-          data={[
-            {key: 'Devin'},
-            {key: 'Jackson'},
-            {key: 'James'},
-            {key: 'Joel'},
-            {key: 'John'},
-            {key: 'Jillian'},
-            {key: 'Jimmy'},
-            {key: 'Julie'},
-          ]}
-          renderItem={({item}) => <Text style={styles.item}>{item.key}</Text>}
-        />
-        </View>
       </View>
     );
   }
