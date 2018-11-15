@@ -1,5 +1,4 @@
-import { Platform, View } from "react-native";
-import { Component } from "react";
+import * as React from "react";
 
 /**
  * Sample React Native App
@@ -9,11 +8,11 @@ import { Component } from "react";
  * @flow
  */
 
-// import {Platform, StyleSheet, Text, View, Dimensions, TouchableNativeFeedback, RippleBackgroundPropType, ThemeAttributeBackgroundPropType, Alert, GestureResponderEvent, ScrollView, FlatList, SectionList} from 'react-native';
-// import { Hello } from './components/Hello';
-// import hexGenerator from './utils/hexGenerator';
-// import { Image } from 'react-native'
-// import { TextInputComponent } from './components/TextInputComponent';
+import {Platform, StyleSheet, Text, View, RippleBackgroundPropType, 
+  ThemeAttributeBackgroundPropType, Alert, GestureResponderEvent, Image} from 'react-native';
+import { Hello } from './components/Hello';
+import hexGenerator from './utils/hexGenerator';
+import { TextInputComponent } from './components/TextInputComponent';
 // import getFacebookMoviesApiRequest, { marshalledMoviesObjectShape, MovieDataSectionsByLetter } from './utils/getFacebookMoviesApiRequest';
 
 const instructions = Platform.select({
@@ -49,7 +48,7 @@ interface State {
 
 type androidNativeButton = RippleBackgroundPropType | ThemeAttributeBackgroundPropType | undefined; 
 
-export default class App extends Component<Props, State> {
+export default class App extends React.Component<Props, State> {
 
   constructor(props: Props){
     super(props); 
@@ -60,42 +59,42 @@ export default class App extends Component<Props, State> {
     }
   }
 
-  private _onPressButton(e: GestureResponderEvent) {
-    Alert.alert("you tapped on button"); 
-  }
+  // private _onPressButton(e: GestureResponderEvent) {
+  //   Alert.alert("you tapped on button"); 
+  // }
 
-  private _onLongPressButton(e: GestureResponderEvent){
-    Alert.alert("you long-pressed a button"); 
-  }
+  // private _onLongPressButton(e: GestureResponderEvent){
+  //   Alert.alert("you long-pressed a button"); 
+  // }
 
   
 
   componentDidMount(){
     // getMoviesFromApiAsync(); 
-    getFacebookMoviesApiRequest((moviesDataObjectGroupingArrOfObjectsByLetter: MovieDataSectionsByLetter)=>{
+    // getFacebookMoviesApiRequest((moviesDataObjectGroupingArrOfObjectsByLetter: MovieDataSectionsByLetter)=>{
       
-      let sectionsListDataArr: movieSectionsShapeForSectionList[] = []; 
+    //   let sectionsListDataArr: movieSectionsShapeForSectionList[] = []; 
 
-      for(let prop in moviesDataObjectGroupingArrOfObjectsByLetter){
-        sectionsListDataArr.push({
-          title: prop,
-          data: (moviesDataObjectGroupingArrOfObjectsByLetter[prop] as marshalledMoviesObjectShape[])
-        })
-      }
+    //   for(let prop in moviesDataObjectGroupingArrOfObjectsByLetter){
+    //     sectionsListDataArr.push({
+    //       title: prop,
+    //       data: (moviesDataObjectGroupingArrOfObjectsByLetter[prop] as marshalledMoviesObjectShape[])
+    //     })
+    //   }
 
-      console.log("api data for SectionsList"); 
-      console.log(sectionsListDataArr)
+    //   console.log("api data for SectionsList"); 
+    //   console.log(sectionsListDataArr)
 
-      this.setState(
-        {
-          movieSections: sectionsListDataArr
-        }
-      )
-    }); 
+    //   this.setState(
+    //     {
+    //       movieSections: sectionsListDataArr
+    //     }
+    //   )
+    // }); 
 
-    window.setInterval(()=>{
-      this.setState({backgroundColour: hexGenerator()}); 
-    }, 200)
+    // window.setInterval(()=>{
+    //   this.setState({backgroundColour: hexGenerator()}); 
+    // }, 200)
   }
 
   render() {
@@ -109,11 +108,9 @@ export default class App extends Component<Props, State> {
     // }
 
     return (
-      <View style={{flex: 1, flexDirection: 'column', 
-      justifyContent: "flex-start", borderWidth: 5, borderColor: "purple",  
-      alignItems: "stretch"}}>
+      <View>
 
-      <Text> my facebook movies list </Text>
+        <Text> my facebook movies list </Text>
 
       {/* [
             {title: 'D', data: ['Devin']},
