@@ -1,24 +1,6 @@
 
 const theMovieDBDotOrgApiToken: string = "f4a9d7aa5091278c42ab52c743613aa8";
 
-const https = require('https'); 
-
-interface httpOptionsObject{
-    hostname: string; 
-    port: number; 
-    path: string; 
-    method: string; 
-}
-
-// const optionsForFacebookMovies = {
-//     hostname: 'facebook.github.io',
-//     port: 443,
-//     path: '/react-native/movies.json',
-//     method: 'GET'
-// }
-
-
-
 // get my facebook profile movies: returns movies
 async function getMyMoviesHTTPRequest(): Promise<marshalledMoviesObjectShape[]>{
     try {
@@ -28,14 +10,19 @@ async function getMyMoviesHTTPRequest(): Promise<marshalledMoviesObjectShape[]>{
         let responseJson = await response.json();
         return responseJson.movies;
       } catch (error) {
-          console.log(error); 
-          return []; 
-          
+        console.log(error); 
+        return [];
       }
 }
 
+interface httpOptionsObject{
+    hostname: string; 
+    port: number; 
+    path: string; 
+    method: string; 
+}
 
-let optionsForMovieDbDiscover = (year: number) => {
+let optionsForMovieDbDiscover = (year: number): httpOptionsObject => {
     return {
         hostname: 'api.themoviedb.org',
         port: 443,
@@ -45,29 +32,17 @@ let optionsForMovieDbDiscover = (year: number) => {
 }
 
 
-function searchForMovieThroughMovieDbApi(options: httpOptionsObject, callbackFn: (jsonObj: object) => void): void{
-    const req = https.request(options, (res: any) => {
-        // console.log(`statusCode: ${res.statusCode}`)
-
-        let data = "";
-
-        res.on('data', (d: string) => {
-            data += d;
-            // console.log(typeof data);
-            // process.stdout.write(d)
-        })
-
-        res.on('end', () => {
-            callbackFn(JSON.parse(data));
-            // // console.log();
-        })
-    })
-
-    req.on('error', (error: any) => {
-        console.error(error)
-    })
-
-    req.end()
+async function searchForMovieThroughMovieDbApi(options: httpOptionsObject): Promise<object>{
+    try {
+        let response = await fetch(
+          `${options.hostname}${options.path}`
+        );
+        let responseJson = await response.json();
+        return responseJson.movies;
+      } catch (error) {
+        console.log(error); 
+        return [];
+      }
 }
 
 
@@ -88,27 +63,6 @@ export interface MovieDataSectionsByLetter{
 }
 
 
-
-let movieSectionsBeginningWithALetter: MovieDataSectionsByLetter = {};
-
-
-export interface marshalledMoviesObjectShape{
-    title: string; 
-    posterImgUrl?: string; 
-    releaseYear: number; 
-    id: number; 
-}
-
-let myMoviesArray: marshalledMoviesObjectShape[];
-
-    // console.log(movieArray);
- myMoviesArray = <marshalledMoviesObjectShape[]>getMyMoviesHTTPRequest();
-
-
-// find img url link for poster
-
-
-
 let findMovieObjFromDataSet = (filmTitle: string, moviesdataSetObject: any): string => {
     for(let i = 0; i < moviesdataSetObject.results.length; i++){
         if(moviesdataSetObject.results[i].title.toUpperCase().includes(filmTitle.toUpperCase()))
@@ -118,10 +72,19 @@ let findMovieObjFromDataSet = (filmTitle: string, moviesdataSetObject: any): str
 }
 
 
+export interface marshalledMoviesObjectShape{
+    title: string; 
+    posterImgUrl?: string; 
+    releaseYear: number; 
+    id: number; 
+}
 
-// timeout to get over async problem
-setTimeout(
-    function(){
+export default (fnCallback: (movies: MovieDataSectionsByLetter) => void) => {
+    (async function (){
+        let movieSectionsBeginningWithALetter: MovieDataSectionsByLetter = {};
+
+
+        let myMoviesArray: marshalledMoviesObjectShape[] = await getMyMoviesHTTPRequest();
         for(let i = 0; i < myMoviesArray.length; i++){
             movieSectionsBeginningWithALetter[myMoviesArray[i].title.substring(0, 1).toUpperCase()] = null;
         }
@@ -134,14 +97,15 @@ setTimeout(
         console.log("letters your found films start with"); 
         console.log(movieHeadersOfLetterXArr);
 
+        (await function(){
+            myMoviesArray.forEach((moviePojo: marshalledMoviesObjectShape)=>{
 
-        myMoviesArray.forEach((moviePojo: marshalledMoviesObjectShape)=>{
-
-            // console.log(moviePojo.releaseYear);
-            // console.log(moviePojo.title);
-            // console.log(optionsForMovieDbDiscover(moviePojo.releaseYear));
-
-            searchForMovieThroughMovieDbApi(optionsForMovieDbDiscover(moviePojo.releaseYear), (moviesDataObject) => {
+                // console.log(moviePojo.releaseYear);
+                // console.log(moviePojo.title);
+                // console.log(optionsForMovieDbDiscover(moviePojo.releaseYear));
+        
+                let moviesDataObject = await searchForMovieThroughMovieDbApi(optionsForMovieDbDiscover(moviePojo.releaseYear)); 
+                
                 moviePojo.posterImgUrl = `${posterPath}${findMovieObjFromDataSet(moviePojo.title, moviesDataObject)}`;
                 for(let prop in movieSectionsBeginningWithALetter){
                     if((prop as string) === moviePojo.title.charAt(0)){
@@ -155,17 +119,20 @@ setTimeout(
                         break; 
                     }
                 }
-            })
-        });
-    }, 200);
+            });
+    })(); 
 
-
-export default (fnCallback: (movies: MovieDataSectionsByLetter) => void) => {
-    setTimeout(()=>{
-        // console.log(myMoviesArray);
-        fnCallback(movieSectionsBeginningWithALetter); 
-    }, 600);
+    fnCallback(movieSectionsBeginningWithALetter); 
 }
+
+
+
+
+
+
+
+
+
 
 
 
