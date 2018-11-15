@@ -10,37 +10,28 @@ interface httpOptionsObject{
     method: string; 
 }
 
-const optionsForFacebookMovies = {
-    hostname: 'facebook.github.io',
-    port: 443,
-    path: '/react-native/movies.json',
-    method: 'GET'
-}
+// const optionsForFacebookMovies = {
+//     hostname: 'facebook.github.io',
+//     port: 443,
+//     path: '/react-native/movies.json',
+//     method: 'GET'
+// }
 
-// get my facebook profile movies
-function getMyMoviesHTTPRequest(callbackFn: (jsonObj: object) => void, options: httpOptionsObject){
-    const req = https.request(options, (res: any) => {
-        // console.log(`statusCode: ${res.statusCode}`)
 
-        let data = "";
 
-        res.on('data', (d: string) => {
-            data += d;
-            // console.log(typeof data);
-            // process.stdout.write(d)
-        })
-
-        res.on('end', () => {
-            callbackFn(JSON.parse(data).movies);
-            // // console.log();
-        })
-    })
-
-    req.on('error', (error: any) => {
-        console.error(error)
-    })
-
-    req.end()
+// get my facebook profile movies: returns movies
+async function getMyMoviesHTTPRequest(): Promise<marshalledMoviesObjectShape[]>{
+    try {
+        let response = await fetch(
+          'https://facebook.github.io/react-native/movies.json',
+        );
+        let responseJson = await response.json();
+        return responseJson.movies;
+      } catch (error) {
+          console.log(error); 
+          return []; 
+          
+      }
 }
 
 
@@ -110,10 +101,8 @@ export interface marshalledMoviesObjectShape{
 
 let myMoviesArray: marshalledMoviesObjectShape[];
 
-getMyMoviesHTTPRequest(function(movieArray){
     // console.log(movieArray);
-    myMoviesArray = <marshalledMoviesObjectShape[]>movieArray;
-}, optionsForFacebookMovies);
+ myMoviesArray = <marshalledMoviesObjectShape[]>getMyMoviesHTTPRequest();
 
 
 // find img url link for poster
