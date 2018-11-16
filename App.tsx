@@ -12,6 +12,7 @@ import {Platform, StyleSheet, Text, View, RippleBackgroundPropType,
   ThemeAttributeBackgroundPropType, Alert, GestureResponderEvent, Image, SectionList} from 'react-native';
 import hexGenerator from './utils/hexGenerator';
 import getFacebookMoviesApiRequest, { marshalledMoviesObjectShape, MovieDataSectionsByLetter } from "./utils/getFacebookMoviesApiRequest";
+import { FilmItemComponent } from "./components/FilmItemComponent";
 // import getFacebookMoviesApiRequest, { marshalledMoviesObjectShape, MovieDataSectionsByLetter } from './utils/getFacebookMoviesApiRequest';
 
 const instructions = Platform.select({
@@ -83,9 +84,9 @@ export default class App extends React.Component<Props, State> {
 
     console.log(this.state.movieSections.length); 
 
-    let moviesList = this.state.movieSections.length !== 0 ? <SectionList style={{height: 500}}
+    let moviesList = this.state.movieSections.length !== 0 ? <SectionList
           sections={this.state.movieSections}
-          renderItem={({item}) => <Text style={styles.item}>{item.title}</Text>}
+          renderItem={({item}) => <FilmItemComponent moviePojo={item}/>}
           renderSectionHeader={({section}) => <Text style={styles.sectionHeader}>{section.title}</Text>}
           keyExtractor={(item: any, index: number) => index.toString()}
         /> : null; 
