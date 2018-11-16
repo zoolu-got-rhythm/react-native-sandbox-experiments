@@ -9,10 +9,9 @@ import * as React from "react";
  */
 
 import {Platform, StyleSheet, Text, View, RippleBackgroundPropType, 
-  ThemeAttributeBackgroundPropType, Alert, GestureResponderEvent, Image} from 'react-native';
-import { Hello } from './components/Hello';
+  ThemeAttributeBackgroundPropType, Alert, GestureResponderEvent, Image, SectionList} from 'react-native';
 import hexGenerator from './utils/hexGenerator';
-import { TextInputComponent } from './components/TextInputComponent';
+import getFacebookMoviesApiRequest, { marshalledMoviesObjectShape, MovieDataSectionsByLetter } from "./utils/getFacebookMoviesApiRequest";
 // import getFacebookMoviesApiRequest, { marshalledMoviesObjectShape, MovieDataSectionsByLetter } from './utils/getFacebookMoviesApiRequest';
 
 const instructions = Platform.select({
@@ -69,33 +68,51 @@ export default class App extends React.Component<Props, State> {
 
   
 
-  componentDidMount(){
+  async componentDidMount(){
+
+    console.log("component did mount"); 
+    getFacebookMoviesApiRequest((movies: MovieDataSectionsByLetter)=>{
+
+
+
+        window.setTimeout(()=>{
+          console.log("callback returned".toUpperCase()); 
+          console.log(movies); 
+          console.log(movies["I"]); 
+
+          let sectionsListDataArr: movieSectionsShapeForSectionList[] = []; 
+
+          for(let prop in movies){
+
+            console.log(prop); 
+            console.log("in movies"); 
+            sectionsListDataArr.push({
+              title: prop,
+              data: movies[prop] as marshalledMoviesObjectShape[]
+            })
+          }
+
+          console.log("api data for SectionsList"); 
+          console.log(sectionsListDataArr)
+
+          this.setState(
+            {
+              movieSections: sectionsListDataArr
+            }
+          )
+        }, 800); 
+        
+      }); 
+    }
     // getMoviesFromApiAsync(); 
     // getFacebookMoviesApiRequest((moviesDataObjectGroupingArrOfObjectsByLetter: MovieDataSectionsByLetter)=>{
       
-    //   let sectionsListDataArr: movieSectionsShapeForSectionList[] = []; 
-
-    //   for(let prop in moviesDataObjectGroupingArrOfObjectsByLetter){
-    //     sectionsListDataArr.push({
-    //       title: prop,
-    //       data: (moviesDataObjectGroupingArrOfObjectsByLetter[prop] as marshalledMoviesObjectShape[])
-    //     })
-    //   }
-
-    //   console.log("api data for SectionsList"); 
-    //   console.log(sectionsListDataArr)
-
-    //   this.setState(
-    //     {
-    //       movieSections: sectionsListDataArr
-    //     }
-    //   )
-    // }); 
+      
 
     // window.setInterval(()=>{
     //   this.setState({backgroundColour: hexGenerator()}); 
     // }, 200)
-  }
+  
 
   render() {
 
@@ -107,22 +124,29 @@ export default class App extends React.Component<Props, State> {
     //   backgroundColor: this.state.backgroundColour,
     // }
 
+
+    console.log(this.state.movieSections.length); 
+
+
+    let moviesList = this.state.movieSections.length != 0 ? <SectionList style={{height: 50}}
+          sections={this.state.movieSections}
+          renderItem={({item}) => <Text style={styles.item}>{item.title}</Text>}
+          renderSectionHeader={({section}) => <Text style={styles.sectionHeader}>{section.title}</Text>}
+          keyExtractor={(item: any, index: number) => index.toString()}
+        /> : null; 
+
     return (
       <View>
 
         <Text> my facebook movies list </Text>
+        {moviesList}
 
       {/* [
             {title: 'D', data: ['Devin']},
             {title: 'J', data: ['Jackson', 'James', 'Jillian', 'Jimmy', 'Joel', 'John', 'Julie']},
           ] */}
 
-        {/* <SectionList style={{height: 50}}
-          sections={this.state.movieSections}
-          renderItem={({item}) => <Text style={styles.item}>{item.title}</Text>}
-          renderSectionHeader={({section}) => <Text style={styles.sectionHeader}>{section.title}</Text>}
-          keyExtractor={(item: any, index: number) => index.toString()}
-        /> */}
+        
 
       </View>
     );

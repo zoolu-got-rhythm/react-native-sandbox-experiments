@@ -33,15 +33,17 @@ let optionsForMovieDbDiscover = (year: number): httpOptionsObject => {
 
 
 async function searchForMovieThroughMovieDbApi(options: httpOptionsObject): Promise<object>{
+
+    console.log(`${options.hostname}${options.path}`); 
     try {
         let response = await fetch(
-          `${options.hostname}${options.path}`
+          `http://${options.hostname}${options.path}`
         );
         let responseJson = await response.json();
-        return responseJson.movies;
+        console.log(responseJson); 
+        return Promise.resolve(responseJson);
       } catch (error) {
-        console.log(error); 
-        return [];
+        return Promise.reject(new Error("movieDB api request failed :("));
       }
 }
 
@@ -79,12 +81,15 @@ export interface marshalledMoviesObjectShape{
     id: number; 
 }
 
-export default (fnCallback: (movies: MovieDataSectionsByLetter) => void) => {
+export default async (fnCallback: (movies: MovieDataSectionsByLetter) => void) => {
     (async function (){
         let movieSectionsBeginningWithALetter: MovieDataSectionsByLetter = {};
 
 
         let myMoviesArray: marshalledMoviesObjectShape[] = await getMyMoviesHTTPRequest();
+        console.log(myMoviesArray); 
+
+
         for(let i = 0; i < myMoviesArray.length; i++){
             movieSectionsBeginningWithALetter[myMoviesArray[i].title.substring(0, 1).toUpperCase()] = null;
         }
@@ -97,42 +102,38 @@ export default (fnCallback: (movies: MovieDataSectionsByLetter) => void) => {
         console.log("letters your found films start with"); 
         console.log(movieHeadersOfLetterXArr);
 
-        (await function(){
-            myMoviesArray.forEach((moviePojo: marshalledMoviesObjectShape)=>{
+          
+        myMoviesArray.forEach(async (moviePojo: marshalledMoviesObjectShape)=>{
 
-                // console.log(moviePojo.releaseYear);
-                // console.log(moviePojo.title);
-                // console.log(optionsForMovieDbDiscover(moviePojo.releaseYear));
-        
-                let moviesDataObject = await searchForMovieThroughMovieDbApi(optionsForMovieDbDiscover(moviePojo.releaseYear)); 
+            // console.log(moviePojo.releaseYear);
+            // console.log(moviePojo.title);
+            // console.log(optionsForMovieDbDiscover(moviePojo.releaseYear));
+    
+            let moviesDataObject: object = 
+                await searchForMovieThroughMovieDbApi(optionsForMovieDbDiscover(moviePojo.releaseYear)); 
                 
-                moviePojo.posterImgUrl = `${posterPath}${findMovieObjFromDataSet(moviePojo.title, moviesDataObject)}`;
-                for(let prop in movieSectionsBeginningWithALetter){
-                    if((prop as string) === moviePojo.title.charAt(0)){
-                        if(movieSectionsBeginningWithALetter[prop] == null){
-                            movieSectionsBeginningWithALetter[prop] = []; 
-                            let movieSectionKeyArray = <marshalledMoviesObjectShape[]>movieSectionsBeginningWithALetter[prop]; 
-                            movieSectionKeyArray.push(moviePojo);  
-                        }else{
-                            (movieSectionsBeginningWithALetter[prop] as marshalledMoviesObjectShape[]).push(moviePojo)
-                        }
-                        break; 
+            console.log(moviesDataObject); 
+            
+            // should be named findIn*DataSetInstead
+            moviePojo.posterImgUrl = `${posterPath}${findMovieObjFromDataSet(moviePojo.title, moviesDataObject)}`;
+
+
+            for(let prop in movieSectionsBeginningWithALetter){
+                if((prop as string) === moviePojo.title.charAt(0)){
+                    if(movieSectionsBeginningWithALetter[prop] == null){
+                        movieSectionsBeginningWithALetter[prop] = []; 
+                        let movieSectionKeyArray = <marshalledMoviesObjectShape[]>movieSectionsBeginningWithALetter[prop]; 
+                        movieSectionKeyArray.push(moviePojo);  
+                    }else{
+                        (movieSectionsBeginningWithALetter[prop] as marshalledMoviesObjectShape[]).push(moviePojo)
                     }
+                    break; 
                 }
-            });
-    })(); 
-
-    fnCallback(movieSectionsBeginningWithALetter); 
+            }
+        });
+        
+        console.log("result of ts correlate film posters utility function"); 
+        console.log(movieSectionsBeginningWithALetter)
+        fnCallback(movieSectionsBeginningWithALetter); 
+    })()
 }
-
-
-
-
-
-
-
-
-
-
-
-
