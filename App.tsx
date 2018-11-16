@@ -34,17 +34,6 @@ interface State {
   movieSections: movieSectionsShapeForSectionList[]; 
 }; 
 
-// function getMoviesFromApiAsync() {
-//   return fetch('https://facebook.github.io/react-native/movies.json')
-//     .then((response) => response.json())
-//     .then((responseJson) => {
-//       return responseJson.movies;
-//     })
-//     .catch((error) => {
-//       console.error(error);
-//     });
-// }
-
 type androidNativeButton = RippleBackgroundPropType | ThemeAttributeBackgroundPropType | undefined; 
 
 export default class App extends React.Component<Props, State> {
@@ -62,57 +51,25 @@ export default class App extends React.Component<Props, State> {
   //   Alert.alert("you tapped on button"); 
   // }
 
-  // private _onLongPressButton(e: GestureResponderEvent){
-  //   Alert.alert("you long-pressed a button"); 
-  // }
-
-  
-
   async componentDidMount(){
+    let movies: MovieDataSectionsByLetter = await getFacebookMoviesApiRequest(); 
 
-    console.log("component did mount"); 
-    getFacebookMoviesApiRequest((movies: MovieDataSectionsByLetter)=>{
+    let sectionsListDataArr: movieSectionsShapeForSectionList[] = []; 
 
-
-
-        window.setTimeout(()=>{
-          console.log("callback returned".toUpperCase()); 
-          console.log(movies); 
-          console.log(movies["I"]); 
-
-          let sectionsListDataArr: movieSectionsShapeForSectionList[] = []; 
-
-          for(let prop in movies){
-
-            console.log(prop); 
-            console.log("in movies"); 
-            sectionsListDataArr.push({
-              title: prop,
-              data: movies[prop] as marshalledMoviesObjectShape[]
-            })
-          }
-
-          console.log("api data for SectionsList"); 
-          console.log(sectionsListDataArr)
-
-          this.setState(
-            {
-              movieSections: sectionsListDataArr
-            }
-          )
-        }, 800); 
-        
-      }); 
+    for(let prop in movies){
+      sectionsListDataArr.push({
+        title: prop,
+        data: movies[prop] as marshalledMoviesObjectShape[]
+      })
     }
-    // getMoviesFromApiAsync(); 
-    // getFacebookMoviesApiRequest((moviesDataObjectGroupingArrOfObjectsByLetter: MovieDataSectionsByLetter)=>{
-      
-      
 
-    // window.setInterval(()=>{
-    //   this.setState({backgroundColour: hexGenerator()}); 
-    // }, 200)
-  
+    this.setState(
+      {
+        movieSections: sectionsListDataArr
+      }
+    )  
+  }   
+
 
   render() {
 
@@ -124,11 +81,9 @@ export default class App extends React.Component<Props, State> {
     //   backgroundColor: this.state.backgroundColour,
     // }
 
-
     console.log(this.state.movieSections.length); 
 
-
-    let moviesList = this.state.movieSections.length != 0 ? <SectionList style={{height: 50}}
+    let moviesList = this.state.movieSections.length !== 0 ? <SectionList style={{height: 500}}
           sections={this.state.movieSections}
           renderItem={({item}) => <Text style={styles.item}>{item.title}</Text>}
           renderSectionHeader={({section}) => <Text style={styles.sectionHeader}>{section.title}</Text>}
@@ -137,17 +92,8 @@ export default class App extends React.Component<Props, State> {
 
     return (
       <View>
-
-        <Text> my facebook movies list </Text>
+        <Text> my movies </Text>
         {moviesList}
-
-      {/* [
-            {title: 'D', data: ['Devin']},
-            {title: 'J', data: ['Jackson', 'James', 'Jillian', 'Jimmy', 'Joel', 'John', 'Julie']},
-          ] */}
-
-        
-
       </View>
     );
   }

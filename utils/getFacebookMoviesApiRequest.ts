@@ -1,5 +1,6 @@
 
 const theMovieDBDotOrgApiToken: string = "f4a9d7aa5091278c42ab52c743613aa8";
+const posterPath: string = "https://image.tmdb.org/t/p/original";
 
 // get my facebook profile movies: returns movies
 async function getMyMoviesHTTPRequest(): Promise<marshalledMoviesObjectShape[]>{
@@ -10,8 +11,9 @@ async function getMyMoviesHTTPRequest(): Promise<marshalledMoviesObjectShape[]>{
         let responseJson = await response.json();
         return responseJson.movies;
       } catch (error) {
-        console.log(error); 
-        return [];
+        // console.log(error); 
+        // return [];
+        throw error; 
       }
 }
 
@@ -31,7 +33,6 @@ let optionsForMovieDbDiscover = (year: number): httpOptionsObject => {
     }
 }
 
-
 async function searchForMovieThroughMovieDbApi(options: httpOptionsObject): Promise<object>{
 
     console.log(`${options.hostname}${options.path}`); 
@@ -47,23 +48,16 @@ async function searchForMovieThroughMovieDbApi(options: httpOptionsObject): Prom
       }
 }
 
-
-
-const posterPath: string = "https://image.tmdb.org/t/p/original";
-
-
 let movieSearchByYearApiPath = (year: number): string => {
     let movieDbDiscoverApiPath: string = `/3/discover/movie?api_key=${theMovieDBDotOrgApiToken}&language=en-US&sort_by=popularity.desc&include_adult=true&include_video=false&page=1&year=${year}`;
     return movieDbDiscoverApiPath;
 };
-
 
 type marshalledMoviesArray = null | marshalledMoviesObjectShape[] | undefined[]; 
 
 export interface MovieDataSectionsByLetter{
     [ key: string ]: marshalledMoviesArray; 
 }
-
 
 let findMovieObjFromDataSet = (filmTitle: string, moviesdataSetObject: any): string => {
     for(let i = 0; i < moviesdataSetObject.results.length; i++){
@@ -73,7 +67,6 @@ let findMovieObjFromDataSet = (filmTitle: string, moviesdataSetObject: any): str
     return "not found";
 }
 
-
 export interface marshalledMoviesObjectShape{
     title: string; 
     posterImgUrl?: string; 
@@ -81,59 +74,56 @@ export interface marshalledMoviesObjectShape{
     id: number; 
 }
 
-export default async (fnCallback: (movies: MovieDataSectionsByLetter) => void) => {
-    (async function (){
-        let movieSectionsBeginningWithALetter: MovieDataSectionsByLetter = {};
+export default async (): Promise<MovieDataSectionsByLetter> => {
+    // this gets mutated
+    let movieSectionsBeginningWithALetter: MovieDataSectionsByLetter = {};
 
+    let myMoviesArray: marshalledMoviesObjectShape[] = await getMyMoviesHTTPRequest();
 
-        let myMoviesArray: marshalledMoviesObjectShape[] = await getMyMoviesHTTPRequest();
-        console.log(myMoviesArray); 
+    for(let i = 0; i < myMoviesArray.length; i++){
+        movieSectionsBeginningWithALetter[myMoviesArray[i].title.substring(0, 1).toUpperCase()] = null;
+    }
 
-
-        for(let i = 0; i < myMoviesArray.length; i++){
-            movieSectionsBeginningWithALetter[myMoviesArray[i].title.substring(0, 1).toUpperCase()] = null;
-        }
-
-        let movieHeadersOfLetterXArr: string[] = [];
-        for(let prop in movieSectionsBeginningWithALetter){
-            movieHeadersOfLetterXArr.push(prop)
-        }
-        
-        console.log("letters your found films start with"); 
-        console.log(movieHeadersOfLetterXArr);
-
-          
-        myMoviesArray.forEach(async (moviePojo: marshalledMoviesObjectShape)=>{
-
-            // console.log(moviePojo.releaseYear);
-            // console.log(moviePojo.title);
-            // console.log(optionsForMovieDbDiscover(moviePojo.releaseYear));
+    let movieHeadersOfLetterXArr: string[] = [];
+    for(let prop in movieSectionsBeginningWithALetter){
+        movieHeadersOfLetterXArr.push(prop)
+    }
     
-            let moviesDataObject: object = 
-                await searchForMovieThroughMovieDbApi(optionsForMovieDbDiscover(moviePojo.releaseYear)); 
-                
-            console.log(moviesDataObject); 
+    const arrayOfMoviesJsonObjects: object[] = await Promise.all(
+        myMoviesArray.map(async (moviePojo: marshalledMoviesObjectShape)=>{ 
+            // get value from promise 
+            return searchForMovieThroughMovieDbApi(optionsForMovieDbDiscover(moviePojo.releaseYear)); 
+        })
+    )
+
+    const arrayOfMarshalledMoviesObjectShapes: marshalledMoviesObjectShape[] = 
+        myMoviesArray.map((moviePojo: marshalledMoviesObjectShape, index: number)=>{
+            return {
+                ...moviePojo, 
+                posterImgUrl: `${posterPath}${findMovieObjFromDataSet(moviePojo.title, arrayOfMoviesJsonObjects[index])}`
+            }
+    })
+
+    // should be pure, avoids mutation: returns fresh value
+    const movieSectionsBeginningWithLetterWithArrData: MovieDataSectionsByLetter = 
+        arrayOfMarshalledMoviesObjectShapes.reduce((accumulatedMovieSectionsBegWithLetterX: MovieDataSectionsByLetter, currentMoviePojo: marshalledMoviesObjectShape) => {
             
-            // should be named findIn*DataSetInstead
-            moviePojo.posterImgUrl = `${posterPath}${findMovieObjFromDataSet(moviePojo.title, moviesDataObject)}`;
-
-
-            for(let prop in movieSectionsBeginningWithALetter){
-                if((prop as string) === moviePojo.title.charAt(0)){
-                    if(movieSectionsBeginningWithALetter[prop] == null){
-                        movieSectionsBeginningWithALetter[prop] = []; 
-                        let movieSectionKeyArray = <marshalledMoviesObjectShape[]>movieSectionsBeginningWithALetter[prop]; 
-                        movieSectionKeyArray.push(moviePojo);  
+            for(let prop in accumulatedMovieSectionsBegWithLetterX){
+                if((prop as string) === currentMoviePojo.title.charAt(0)){
+                    if(accumulatedMovieSectionsBegWithLetterX[prop] == null){
+                        accumulatedMovieSectionsBegWithLetterX[prop] = []; 
+                        let movieSectionKeyArray = <marshalledMoviesObjectShape[]>accumulatedMovieSectionsBegWithLetterX[prop]; 
+                        movieSectionKeyArray.push(currentMoviePojo);  
                     }else{
-                        (movieSectionsBeginningWithALetter[prop] as marshalledMoviesObjectShape[]).push(moviePojo)
+                        (accumulatedMovieSectionsBegWithLetterX[prop] as marshalledMoviesObjectShape[]).push(currentMoviePojo); 
                     }
                     break; 
                 }
             }
-        });
+
+            return accumulatedMovieSectionsBegWithLetterX; 
+
+    }, movieSectionsBeginningWithALetter); 
         
-        console.log("result of ts correlate film posters utility function"); 
-        console.log(movieSectionsBeginningWithALetter)
-        fnCallback(movieSectionsBeginningWithALetter); 
-    })()
+    return movieSectionsBeginningWithLetterWithArrData; 
 }
