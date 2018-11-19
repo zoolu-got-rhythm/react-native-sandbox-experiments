@@ -19,7 +19,7 @@ export class FilmItemComponent extends React.Component<Props> {
       return (
           <View style={{flex: 1, flexDirection: "row", alignItems: "stretch", height: 140}}> 
               {/* // image wrapper */}
-              <View style={{backgroundColor: "lime", padding: 5, flex: 1}}> 
+              <View style={{backgroundColor: "lime", padding: 10, flex: 1}}> 
               <Image
           style={{flex: 1}}
           resizeMode="contain"

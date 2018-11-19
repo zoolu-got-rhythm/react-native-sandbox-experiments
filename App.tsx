@@ -13,6 +13,7 @@ import {Platform, StyleSheet, Text, View, RippleBackgroundPropType,
 import hexGenerator from './utils/hexGenerator';
 import getFacebookMoviesApiRequest, { marshalledMoviesObjectShape, MovieDataSectionsByLetter } from "./utils/getFacebookMoviesApiRequest";
 import { FilmItemComponent } from "./components/FilmItemComponent";
+import ListHeader from "./components/ListHeader";
 // import getFacebookMoviesApiRequest, { marshalledMoviesObjectShape, MovieDataSectionsByLetter } from './utils/getFacebookMoviesApiRequest';
 
 const instructions = Platform.select({
@@ -87,7 +88,7 @@ export default class App extends React.Component<Props, State> {
     let moviesList = this.state.movieSections.length !== 0 ? <SectionList
           sections={this.state.movieSections}
           renderItem={({item}) => <FilmItemComponent moviePojo={item}/>}
-          renderSectionHeader={({section}) => <Text style={styles.sectionHeader}>{section.title}</Text>}
+          renderSectionHeader={({section}) => <ListHeader letter={section.title} />}
           keyExtractor={(item: any, index: number) => index.toString()}
         /> : null; 
 
