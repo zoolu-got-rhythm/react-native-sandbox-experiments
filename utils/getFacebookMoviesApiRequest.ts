@@ -59,17 +59,26 @@ export interface MovieDataSectionsByLetter{
     [ key: string ]: marshalledMoviesArray; 
 }
 
-let findMovieObjFromDataSet = (filmTitle: string, moviesdataSetObject: any): string => {
+interface movieJsonImagePaths{
+    poster_path: string; 
+    backdrop_path: string; 
+}
+
+let findMovieObjFromDataSet = (filmTitle: string, moviesdataSetObject: any): movieJsonImagePaths => {
     for(let i = 0; i < moviesdataSetObject.results.length; i++){
         if(moviesdataSetObject.results[i].title.toUpperCase().includes(filmTitle.toUpperCase()))
-            return moviesdataSetObject.results[i].poster_path;
+            return {
+                poster_path: moviesdataSetObject.results[i].poster_path,
+                backdrop_path: moviesdataSetObject.results[i].backdrop_path
+            }
     }
-    return "not found";
+    throw new Error("could not find your FB movie in Movie DB API"); 
 }
 
 export interface marshalledMoviesObjectShape{
     title: string; 
     posterImgUrl?: string; 
+    posterBackgroundImgUrl?: string; 
     releaseYear: number; 
     id: number; 
 }
@@ -98,9 +107,11 @@ export default async (): Promise<MovieDataSectionsByLetter> => {
 
     const arrayOfMarshalledMoviesObjectShapes: marshalledMoviesObjectShape[] = 
         myMoviesArray.map((moviePojo: marshalledMoviesObjectShape, index: number)=>{
+            let posterAndBackgroundImgPathForFoundMovie = findMovieObjFromDataSet(moviePojo.title, arrayOfMoviesJsonObjects[index]); 
             return {
                 ...moviePojo, 
-                posterImgUrl: `${posterPath}${findMovieObjFromDataSet(moviePojo.title, arrayOfMoviesJsonObjects[index])}`
+                posterImgUrl: `${posterPath}${posterAndBackgroundImgPathForFoundMovie.poster_path}`,
+                posterBackgroundImgUrl: `${posterPath}${posterAndBackgroundImgPathForFoundMovie.backdrop_path}`
             }
     })
 
