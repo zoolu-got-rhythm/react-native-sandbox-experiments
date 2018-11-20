@@ -13,7 +13,7 @@ export default function(props: Props){
     for(let i: number = 0; i <= 10; i++){
         const letter: string | null = i === 0 ? props.letter.toUpperCase() : null; 
         childrenBoxesArr.push(
-            <View style={{flex: 1, backgroundColor: hexGenerator()}} key={i}> 
+            <View style={{flex: 1, backgroundColor: hexGenerator(150, 200)}} key={i}> 
                 <Text style={{fontWeight: "bold", color: "white", textAlign: "center"}}> 
                     {letter} 
                 </Text>

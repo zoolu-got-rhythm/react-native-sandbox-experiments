@@ -44,7 +44,7 @@ export default class App extends React.Component<Props, State> {
     super(props); 
 
     this.state = {
-      backgroundColour: hexGenerator(),
+      backgroundColour: hexGenerator(50, 100),
       movieSections: []
     }
   }
