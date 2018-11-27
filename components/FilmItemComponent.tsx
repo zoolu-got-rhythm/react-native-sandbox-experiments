@@ -17,7 +17,7 @@ export class FilmItemComponent extends React.Component<Props> {
 
   render(){
       return (
-          <View style={{flex: 1, flexDirection: "row", alignItems: "stretch", height: 140}}> 
+          <View style={{flex: 1, flexDirection: "row", alignItems: "stretch", height: 140, overflow: "hidden"}}> 
             <View
                     style={{
                         position: 'absolute',
@@ -25,6 +25,7 @@ export class FilmItemComponent extends React.Component<Props> {
                         left: 0,
                         width: 500,
                         height: 200,
+                        // zIndex: 5
                     }}
                     >
                         <Image
@@ -32,6 +33,7 @@ export class FilmItemComponent extends React.Component<Props> {
                             flex: 1,
                             opacity: 0.3,
                             resizeMode:"cover",
+                            // zIndex: -5
                             }}
                             source={{ uri: this.props.moviePojo.posterBackgroundImgUrl}}
                         />
