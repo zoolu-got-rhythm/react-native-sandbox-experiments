@@ -62,6 +62,8 @@ export interface MovieDataSectionsByLetter{
 interface movieJsonImagePaths{
     poster_path: string; 
     backdrop_path: string; 
+    // description_path; 
+    overview: string; 
 }
 
 let findMovieObjFromDataSet = (filmTitle: string, moviesdataSetObject: any): movieJsonImagePaths => {
@@ -69,7 +71,8 @@ let findMovieObjFromDataSet = (filmTitle: string, moviesdataSetObject: any): mov
         if(moviesdataSetObject.results[i].title.toUpperCase().includes(filmTitle.toUpperCase()))
             return {
                 poster_path: moviesdataSetObject.results[i].poster_path,
-                backdrop_path: moviesdataSetObject.results[i].backdrop_path
+                backdrop_path: moviesdataSetObject.results[i].backdrop_path,
+                overview: moviesdataSetObject.results[i].overview
             }
     }
     throw new Error("could not find your FB movie in Movie DB API"); 
@@ -79,6 +82,7 @@ export interface marshalledMoviesObjectShape{
     title: string; 
     posterImgUrl?: string; 
     posterBackgroundImgUrl?: string; 
+    movieDescription?: string; 
     releaseYear: number; 
     id: number; 
 }
@@ -111,7 +115,8 @@ export default async (): Promise<MovieDataSectionsByLetter> => {
             return {
                 ...moviePojo, 
                 posterImgUrl: `${posterPath}${posterAndBackgroundImgPathForFoundMovie.poster_path}`,
-                posterBackgroundImgUrl: `${posterPath}${posterAndBackgroundImgPathForFoundMovie.backdrop_path}`
+                posterBackgroundImgUrl: `${posterPath}${posterAndBackgroundImgPathForFoundMovie.backdrop_path}`,
+                movieDescription: `${posterPath}${posterAndBackgroundImgPathForFoundMovie.overview}`
             }
     })
 

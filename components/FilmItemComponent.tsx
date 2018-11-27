@@ -1,6 +1,12 @@
 import React from "react";
-import { View, StyleSheet, TextInput, Text, Image, Button, TouchableWithoutFeedback } from "react-native";
+import { View, StyleSheet, TextInput, Text, Image, Button, TouchableWithoutFeedback, ScrollView } from "react-native";
 import { marshalledMoviesObjectShape } from "../utils/getFacebookMoviesApiRequest";
+
+//@ts-ignore
+
+
+import {NativeModules} from 'react-native';
+const CustomToastModule = NativeModules.ToastExample;  
 
 export interface Props {
     moviePojo: marshalledMoviesObjectShape
@@ -16,9 +22,11 @@ export class FilmItemComponent extends React.Component<Props> {
   }
 
   render(){
+
+        console.log(CustomToastModule); 
       return (
           <View style={{flex: 1, flexDirection: "row", alignItems: "stretch", height: 140, overflow: "hidden"}}> 
-            <View
+            <View onTouchStart={() => CustomToastModule.show("hellllllo", CustomToastModule.SHORT)}
                     style={{
                         position: 'absolute',
                         top: 0,
@@ -54,15 +62,18 @@ export class FilmItemComponent extends React.Component<Props> {
 
                   </View>
 
-                  {/* image content wrapper */}
-                  <View style={{flex: 4, marginTop: 10}}>  
+                  <View style={{flex: 4, marginTop: 10,}}>  
 
-                    <View style={{backgroundColor: "#11111190", alignSelf: "baseline", padding: 5,}}> 
+                    <View style={{backgroundColor: "#11111190", alignSelf: "baseline", padding: 5}}> 
 
                       <Text style={styles.movieDescription}> {this.props.moviePojo.title} </Text> 
                         <Text style={styles.movieReleaseYear}> {this.props.moviePojo.releaseYear} </Text>
 
                         </View> 
+                        <ScrollView style={{backgroundColor: "#11111190", alignSelf: "baseline", padding: 5, marginTop: 5, marginRight: 10, marginBottom: 10, maxHeight: 65}}> 
+                            <Text style={styles.movieReleaseYear}> {(this.props.moviePojo.movieDescription as string).substring(0, 250)} </Text>
+
+                            </ScrollView>
                       </View> 
               
           </View>
