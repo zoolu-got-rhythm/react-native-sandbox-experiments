@@ -9,12 +9,17 @@ import * as React from "react";
  */
 
 import {Platform, StyleSheet, Text, View, RippleBackgroundPropType, 
-  ThemeAttributeBackgroundPropType, Alert, GestureResponderEvent, Image, SectionList} from 'react-native';
+  ThemeAttributeBackgroundPropType, Alert, GestureResponderEvent, Image, SectionList, Dimensions} from 'react-native';
 import hexGenerator from './utils/hexGenerator';
 import getFacebookMoviesApiRequest, { marshalledMoviesObjectShape, MovieDataSectionsByLetter } from "./utils/getFacebookMoviesApiRequest";
 import { FilmItemComponent } from "./components/FilmItemComponent";
 import ListHeader from "./components/ListHeader";
 // import getFacebookMoviesApiRequest, { marshalledMoviesObjectShape, MovieDataSectionsByLetter } from './utils/getFacebookMoviesApiRequest';
+import {requireNativeComponent} from "react-native"; 
+const RCTCustomApiRequestComponent = requireNativeComponent("RCTCustomApiRequestComponent") as any; 
+
+// console.log(RCTCustomApiRequestLoaderComponent); 
+
 
 const instructions = Platform.select({
   ios: 'Press Cmd+R to reload,\n' + 'Cmd+D or shake for dev menu',
@@ -34,6 +39,7 @@ interface movieSectionsShapeForSectionList{
 interface State {
   backgroundColour: string; 
   movieSections: movieSectionsShapeForSectionList[]; 
+  orientation: string; 
 }; 
 
 type androidNativeButton = RippleBackgroundPropType | ThemeAttributeBackgroundPropType | undefined; 
@@ -45,8 +51,22 @@ export default class App extends React.Component<Props, State> {
 
     this.state = {
       backgroundColour: hexGenerator(50, 100),
-      movieSections: []
+      movieSections: [], 
+      orientation: "portrait"
     }
+
+    let self = this; 
+
+    // Event Listener for orientation changes
+    Dimensions.addEventListener('change', () => {
+      this.setState({
+          //@ts-ignore
+          orientation: "landscape"
+      });
+
+      Alert.alert("changing screen orientation"); 
+      // self.forceUpdate(); 
+  });
   }
 
   // private _onPressButton(e: GestureResponderEvent) {
@@ -54,6 +74,12 @@ export default class App extends React.Component<Props, State> {
   // }
 
   async componentDidMount(){
+
+    // window.setInterval((): void=>{
+    //   // this.forceUpdate(); 
+    // }, 5000)
+
+
     let movies: MovieDataSectionsByLetter = await getFacebookMoviesApiRequest(); 
 
     let sectionsListDataArr: movieSectionsShapeForSectionList[] = []; 
@@ -94,6 +120,10 @@ export default class App extends React.Component<Props, State> {
 
     return (
       <View>
+        {/* wrap custom component into js component class wrapper for type(props) inference with typescript */ }
+        <View style={{ height:105, flexDirection: "row", backgroundColor: this.state.orientation === "portrait" ? "red" : "green"}}>
+          <RCTCustomApiRequestComponent shouldScan={true} style={{flex: 1}}/>
+        </View>
         <Text> my movies </Text>
         {moviesList}
       </View>

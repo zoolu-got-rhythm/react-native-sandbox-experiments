@@ -1,12 +1,14 @@
 import React from "react";
-import { View, StyleSheet, TextInput, Text, Image, Button, TouchableWithoutFeedback, ScrollView } from "react-native";
+import { View, StyleSheet, TextInput, Text, Image, Button, TouchableWithoutFeedback, ScrollView, Platform, DeviceEventEmitter } from "react-native";
 import { marshalledMoviesObjectShape } from "../utils/getFacebookMoviesApiRequest";
 
 //@ts-ignore
 
 
 import {NativeModules} from 'react-native';
+import { relative } from "path";
 const CustomToastModule = NativeModules.ToastExample;  
+const CustomScreenDimentionsModule = NativeModules.UIManagerModule; 
 
 export interface Props {
     moviePojo: marshalledMoviesObjectShape
@@ -19,6 +21,56 @@ export interface Props {
 export class FilmItemComponent extends React.Component<Props> {
   constructor(props: Props) {
       super(props); 
+      this.getAndroidScreenDimentions = this.getAndroidScreenDimentions.bind(this); 
+      this.getAndroidScreenDimentionsAsync = this.getAndroidScreenDimentionsAsync.bind(this); 
+  }
+
+  getAndroidScreenDimentions(): void{
+    CustomScreenDimentionsModule.measureLayout(
+        100,
+        100,
+        (msg: string) => {
+          console.log(msg);
+        },
+        (x: number, y: number, width: number, height: number) => {
+          CustomToastModule.show(x + ':' + y + ':' + width + ':' + height, CustomToastModule.SHORT);
+        },
+      );
+  }
+
+  async getAndroidScreenDimentionsAsync(): Promise<void>{
+    let {relativeX, relativeY, width, height} = await CustomScreenDimentionsModule.measureLayoutPromise(
+        100,
+        100,
+      );
+
+      CustomToastModule.show("from async: " + relativeX + ':' + relativeY + ':' + width + ':' + height, CustomToastModule.SHORT)
+  }
+
+  componentDidMount(){
+        DeviceEventEmitter.addListener('androidCounter', function(e: Event) {
+          // handle event.
+          // @ts-ignore
+          console.log("ANDROID COUNT: " + e.count); 
+        });
+
+        DeviceEventEmitter.addListener('toastModuleOnResume', function(e: Event) {
+            // handle event.
+            // @ts-ignore
+            console.log("ANDROID TOAST MODULE RESUME"); 
+          });
+
+          DeviceEventEmitter.addListener('toastModuleOnPause', function(e: Event) {
+            // handle event.
+            // @ts-ignore
+            console.log("ANDROID TOAST MODULE PAUSE"); 
+          });
+
+          DeviceEventEmitter.addListener('toastModuleOnDestroy', function(e: Event) {
+            // handle event.
+            // @ts-ignore
+            console.log("ANDROID TOAST MODULE DESTROY"); 
+          });
   }
 
   render(){
@@ -64,7 +116,7 @@ export class FilmItemComponent extends React.Component<Props> {
 
                   <View style={{flex: 4, marginTop: 10,}}>  
 
-                    <View style={{backgroundColor: "#11111190", alignSelf: "baseline", padding: 5}}> 
+                    <View onTouchStart={Platform.OS === "android" ? this.getAndroidScreenDimentionsAsync : ()=>{}} style={{backgroundColor: "#11111190", alignSelf: "baseline", padding: 5}}> 
 
                       <Text style={styles.movieDescription}> {this.props.moviePojo.title} </Text> 
                         <Text style={styles.movieReleaseYear}> {this.props.moviePojo.releaseYear} </Text>
