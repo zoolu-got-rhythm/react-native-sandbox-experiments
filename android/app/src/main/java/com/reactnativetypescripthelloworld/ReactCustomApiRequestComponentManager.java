@@ -1,6 +1,7 @@
 package com.reactnativetypescripthelloworld;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.View;
 
 import com.facebook.react.common.MapBuilder;
@@ -72,6 +73,8 @@ public class ReactCustomApiRequestComponentManager extends SimpleViewManager<Sca
     @ReactProp(name = "width")
     public void setWidth(ScanningForDevicesCompoundView view, float width){
         view.setWidth((int) PixelUtil.toPixelFromDIP(width));
+
+        Log.d("pixel i'm after", Float.toString(PixelUtil.toDIPFromPixel(150)));
     }
 
     @ReactProp(name = "messageToUser")

@@ -1,5 +1,5 @@
 import React from "react";
-import { requireNativeComponent } from "react-native";
+import { requireNativeComponent, View, PixelRatio } from "react-native";
 const RCTCustomApiRequestComponent = requireNativeComponent("RCTCustomApiRequestComponent") as any; 
 
 // these prop types map to the android native component view manager
@@ -18,7 +18,9 @@ export default class CustomApiLoaderVisual extends React.Component<Props> {
 
     render() {
         return (
-            <RCTCustomApiRequestComponent {...this.props} style={{flex: 1}} />
+            <View style={{height: 150 / PixelRatio.get(), backgroundColor: "green"}}> 
+                <RCTCustomApiRequestComponent {...this.props} style={{flex: 1}} />
+            </View>
         )
     }
 

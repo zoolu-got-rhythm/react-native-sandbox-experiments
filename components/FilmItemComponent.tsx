@@ -107,7 +107,7 @@ export class FilmItemComponent extends React.Component<Props> {
                 //   {backgroundColor: '#11111190', 
                   {padding: 10, flex: 1}}> 
               <Image
-          style={{flex: 1, borderColor: "#111", borderWidth: 5}}
+          style={{flex: 1, borderColor: "lime", borderWidth: 5}}
           resizeMode="contain"
           source={{uri: this.props.moviePojo.posterImgUrl}}
         />

@@ -9,7 +9,7 @@ import * as React from "react";
  */
 
 import {Platform, StyleSheet, Text, View, RippleBackgroundPropType, 
-  ThemeAttributeBackgroundPropType, Alert, GestureResponderEvent, Image, SectionList, Dimensions} from 'react-native';
+  ThemeAttributeBackgroundPropType, Alert, GestureResponderEvent, Image, SectionList, Dimensions, PixelRatio} from 'react-native';
 import hexGenerator from './utils/hexGenerator';
 import getFacebookMoviesApiRequest, { marshalledMoviesObjectShape, MovieDataSectionsByLetter } from "./utils/getFacebookMoviesApiRequest";
 import { FilmItemComponent } from "./components/FilmItemComponent";
@@ -55,7 +55,7 @@ export default class App extends React.Component<Props, State> {
       backgroundColour: hexGenerator(50, 100),
       movieSections: [], 
       orientation: Dimensions.get("screen").width > Dimensions.get("screen").height ? 
-      "landscape" : "portrait", 
+       "landscape" : "portrait",
       screenWidth: Dimensions.get("screen").width,
       screenHeight: Dimensions.get("window").height,
       isFetchingFilmsFromAPI: true
@@ -70,10 +70,10 @@ export default class App extends React.Component<Props, State> {
       this.setState({
           //@ts-ignore
           orientation: Dimensions.get("screen").width > Dimensions.get("screen").height ? 
-            "portrait" : "landscape",
+            "landscape" : "portrait",
       });
 
-      Alert.alert(String(Dimensions.get("screen").width)); 
+      // Alert.alert(String(Dimensions.get("screen").width)); 
 
       // self.forceUpdate(); 
   });
@@ -123,6 +123,9 @@ export default class App extends React.Component<Props, State> {
 
   async componentDidMount(){
     console.log("hello"); 
+    Alert.alert("pixel ratio " + String(PixelRatio.get())
+      + "round to nearest pixel" + String(PixelRatio.roundToNearestPixel(150))
+    ); 
     await this.fetchMovies(); 
   }   
 
@@ -147,22 +150,24 @@ export default class App extends React.Component<Props, State> {
         /> : null; 
 
     return (
-      <View>
+      <View style={{flexDirection: "column"}}>
         {/* wrap custom component into js component class wrapper for type(props) inference with typescript */ }
-        <View style={{ height:105, flexDirection: "row", backgroundColor: this.state.orientation === "portrait" ? "red" : "green"}}>
+        {/* <View style={{ height:105, flexDirection: "row", backgroundColor: this.state.orientation === "portrait" ? "red" : "green"}}> */}
           <CustomApiLoaderVisual 
             shouldScan={this.state.isFetchingFilmsFromAPI} 
-            colourHex={this.state.orientation === "portrait" ? "#4433ba" : "#a48ae9"} 
+            colourHex={this.state.orientation === "portrait" ? "lime" : "red"} 
             width={this.state.orientation === "portrait" ? this.state.screenWidth : this.state.screenHeight}
             messageToUser={this.state.isFetchingFilmsFromAPI ? "fetching movie data..." : "have received movie data..."}
             onTouchEnd={async () => {
               // console.log("clicked")
-              await this.setState({isFetchingFilmsFromAPI: true}); 
-              await this.fetchMovies(); 
+              if(!this.state.isFetchingFilmsFromAPI){
+                await this.setState({isFetchingFilmsFromAPI: true}); 
+                await this.fetchMovies(); 
+              }
             }}
           /> 
-        </View>
-        <Text> my movies </Text>
+        {/* </View> */}
+        {/* <Text> my movies </Text> */}
         {moviesList}
       </View>
     );
