@@ -44,7 +44,7 @@ export class FilmItemComponent extends React.Component<Props> {
         100,
       );
 
-      CustomToastModule.show("from async: " + relativeX + ':' + relativeY + ':' + width + ':' + height, CustomToastModule.SHORT)
+      CustomToastModule.show("from async: DIP" + relativeX + ':' + relativeY + ':' + width + ':' + height, CustomToastModule.SHORT)
   }
 
   componentDidMount(){

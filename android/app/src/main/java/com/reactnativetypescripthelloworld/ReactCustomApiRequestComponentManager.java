@@ -3,10 +3,14 @@ package com.reactnativetypescripthelloworld;
 import android.content.Context;
 import android.view.View;
 
+import com.facebook.react.common.MapBuilder;
+import com.facebook.react.uimanager.PixelUtil;
 import com.facebook.react.uimanager.SimpleViewManager;
 import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.annotations.ReactProp;
 import com.reactnativetypescripthelloworld.CustomAPIRequestComponent.ScanningForDevicesCompoundView;
+
+import java.util.Map;
 
 public class ReactCustomApiRequestComponentManager extends SimpleViewManager<ScanningForDevicesCompoundView> {
     public static final String REACT_CLASS = "RCTCustomApiRequestComponent";
@@ -26,25 +30,52 @@ public class ReactCustomApiRequestComponentManager extends SimpleViewManager<Sca
         return new ScanningForDevicesCompoundView(reactContext);
     }
 
+    @Override
+    public Map getExportedCustomBubblingEventTypeConstants() {
+
+        return MapBuilder.builder()
+                .put(
+                        "onRefresh",
+                        MapBuilder.of(
+                                "phasedRegistrationNames",
+                                MapBuilder.of("bubbled", "onTouchEnd")))
+                .build();
+    }
+
     @ReactProp(name = "shouldScan", defaultBoolean = false)
-    public void setSrc(ScanningForDevicesCompoundView view, Boolean bool) {
+    public void shouldScan(ScanningForDevicesCompoundView view, Boolean bool) {
         if(bool){
             view.startScan();
-            view.connectedToApi();
         }else{
-            view.startScan();
+            view.stopScan();
         }
     }
 
     // could get screen size directly from JavaScript instead
-    @ReactProp(name = "orientation")
-    public void setSrc(ScanningForDevicesCompoundView view, String orientation) {
-        if(orientation.equals(LANDSCAPE)){
+//    @ReactProp(name = "orientation")
+//    public void setOrientation(ScanningForDevicesCompoundView view, String orientation) {
+//        if(orientation.equals(LANDSCAPE)){
+//
+//        }
+//
+//        if(orientation.equals(PORTRAIT)){
+//
+//        }
+//    }
 
-        }
+    @ReactProp(name = "colourHex")
+    public void setColour(ScanningForDevicesCompoundView view, String colourHex){
+        view.setForegroundColour(colourHex);
+    }
 
-        if(orientation.equals(PORTRAIT)){
+    // note: a pixel will likely be lost if float to int cast is done in prop meth parameters
+    @ReactProp(name = "width")
+    public void setWidth(ScanningForDevicesCompoundView view, float width){
+        view.setWidth((int) PixelUtil.toPixelFromDIP(width));
+    }
 
-        }
+    @ReactProp(name = "messageToUser")
+    public void messageToUser(ScanningForDevicesCompoundView view, String messageToUser){
+        view.setMessageForUser(messageToUser);
     }
 }

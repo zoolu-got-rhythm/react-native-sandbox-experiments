@@ -1,7 +1,10 @@
 package com.reactnativetypescripthelloworld.CustomAPIRequestComponent;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.Resources;
+import android.graphics.Color;
 import android.graphics.Point;
 import android.os.Handler;
 import android.os.Parcelable;
@@ -12,6 +15,7 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.facebook.react.bridge.ReactContext;
+import com.facebook.react.uimanager.PixelUtil;
 import com.facebook.react.uimanager.ThemedReactContext;
 
 
@@ -31,14 +35,11 @@ public class ScanningForDevicesCompoundView extends LinearLayout {
         this.setOrientation(LinearLayout.HORIZONTAL);
 
         this.searchForDevicesView =
-                new SearchForDevicesTextView(((ReactContext) getContext()).getCurrentActivity(),
-                        "connected to NEARBY API....",150);
+                new SearchForDevicesTextView(((ReactContext) getContext()).getCurrentActivity(),150);
         this.addView(searchForDevicesView);
 
-        this.rippleWhenTouchesCanvas = new RippleWhenTouchesCanvas(((ReactContext) getContext()).getCurrentActivity(), 150, 150);
+        this.rippleWhenTouchesCanvas = new RippleWhenTouchesCanvas(context, 150, 150);
         this.addView(rippleWhenTouchesCanvas);
-
-
     }
 
     @Override
@@ -60,40 +61,66 @@ public class ScanningForDevicesCompoundView extends LinearLayout {
 
     }
 
-    @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-        Toast.makeText(getContext(), "on measure", Toast.LENGTH_LONG);
+    public void setWidth(int width){
+
+//        getContext().getResources()
+
+        this.searchForDevicesView.setWidth(width);
+        Log.d("ScanningForDevices", "setting new width");
+    }
+
+    private int getNavigationBarHeight(){
+        Resources resources = getContext().getResources();
+        int resourceId = resources.getIdentifier("navigation_bar_height", "dimen", "android");
+        if (resourceId > 0) {
+            return resources.getDimensionPixelSize(resourceId);
+        }
+        return 0;
+    }
+
+    public void setForegroundColour(String hex){
+        int colourFromHex = Color.parseColor(hex);
+        this.searchForDevicesView.setTextColor(colourFromHex);
+        this.rippleWhenTouchesCanvas.setColour(colourFromHex);
+
+        Log.d("ScanningForDevices", "setting foreground colour");
 
     }
 
-    @Override
-    protected void onLayout(boolean changed, int l, int t, int r, int b) {
-        super.onLayout(changed, l, t, r, b);
-        Toast.makeText(getContext(), "on layout", Toast.LENGTH_LONG);
-    }
-
-    @Override
-    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-        super.onSizeChanged(w, h, oldw, oldh);
-        Toast.makeText(getContext(), "on size changed", Toast.LENGTH_LONG);
-    }
-
-    @Override
-    protected void onAttachedToWindow() {
-        super.onAttachedToWindow();
-
-        Log.d("CUSTOM VIEW", "attached");
-
-        new Handler().post(new Runnable(){
-            @Override
-            public void run() {
-                Toast.makeText(getContext(), "on attached to window", Toast.LENGTH_LONG);
-            }
-        });
-
-
-    }
+//    @Override
+//    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+//        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+//        Toast.makeText(getContext(), "on measure", Toast.LENGTH_LONG);
+//
+//    }
+//
+//    @Override
+//    protected void onLayout(boolean changed, int l, int t, int r, int b) {
+//        super.onLayout(changed, l, t, r, b);
+//        Toast.makeText(getContext(), "on layout", Toast.LENGTH_LONG);
+//    }
+//
+//    @Override
+//    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+//        super.onSizeChanged(w, h, oldw, oldh);
+//        Toast.makeText(getContext(), "on size changed", Toast.LENGTH_LONG);
+//    }
+//
+//    @Override
+//    protected void onAttachedToWindow() {
+//        super.onAttachedToWindow();
+//
+//        Log.d("CUSTOM VIEW", "attached");
+//
+//        new Handler().post(new Runnable(){
+//            @Override
+//            public void run() {
+//                Toast.makeText(getContext(), "on attached to window", Toast.LENGTH_LONG);
+//            }
+//        });
+//
+//
+//    }
 
     public void startScan(){
         if(this.timer != null)
@@ -114,13 +141,7 @@ public class ScanningForDevicesCompoundView extends LinearLayout {
         this.timer = null;
     }
 
-    public void connectedToApi(){
-        this.searchForDevicesView.startScan();
+    public void setMessageForUser(String msg){
+        this.searchForDevicesView.setTextToDisplay(msg);
     }
-
-    public void notConnectedToApi(){
-       this.searchForDevicesView.stopScan();
-    }
-
-
 }

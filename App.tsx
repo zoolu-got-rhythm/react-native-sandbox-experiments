@@ -14,9 +14,8 @@ import hexGenerator from './utils/hexGenerator';
 import getFacebookMoviesApiRequest, { marshalledMoviesObjectShape, MovieDataSectionsByLetter } from "./utils/getFacebookMoviesApiRequest";
 import { FilmItemComponent } from "./components/FilmItemComponent";
 import ListHeader from "./components/ListHeader";
+import CustomApiLoaderVisual from "./components/CustomApiLoaderVisual";
 // import getFacebookMoviesApiRequest, { marshalledMoviesObjectShape, MovieDataSectionsByLetter } from './utils/getFacebookMoviesApiRequest';
-import {requireNativeComponent} from "react-native"; 
-const RCTCustomApiRequestComponent = requireNativeComponent("RCTCustomApiRequestComponent") as any; 
 
 // console.log(RCTCustomApiRequestLoaderComponent); 
 
@@ -40,6 +39,9 @@ interface State {
   backgroundColour: string; 
   movieSections: movieSectionsShapeForSectionList[]; 
   orientation: string; 
+  screenWidth: number; 
+  screenHeight: number; 
+  isFetchingFilmsFromAPI: boolean; 
 }; 
 
 type androidNativeButton = RippleBackgroundPropType | ThemeAttributeBackgroundPropType | undefined; 
@@ -52,35 +54,52 @@ export default class App extends React.Component<Props, State> {
     this.state = {
       backgroundColour: hexGenerator(50, 100),
       movieSections: [], 
-      orientation: "portrait"
+      orientation: Dimensions.get("screen").width > Dimensions.get("screen").height ? 
+      "landscape" : "portrait", 
+      screenWidth: Dimensions.get("screen").width,
+      screenHeight: Dimensions.get("window").height,
+      isFetchingFilmsFromAPI: true
     }
 
     let self = this; 
 
     // Event Listener for orientation changes
     Dimensions.addEventListener('change', () => {
+
+      
       this.setState({
           //@ts-ignore
-          orientation: "landscape"
+          orientation: Dimensions.get("screen").width > Dimensions.get("screen").height ? 
+            "portrait" : "landscape",
       });
 
-      Alert.alert("changing screen orientation"); 
+      Alert.alert(String(Dimensions.get("screen").width)); 
+
       // self.forceUpdate(); 
   });
   }
 
-  // private _onPressButton(e: GestureResponderEvent) {
-  //   Alert.alert("you tapped on button"); 
-  // }
+  async sleep(delayInMs: number): Promise<object>{
+    return new Promise(resolve => setTimeout(resolve, delayInMs)); 
+  } 
+  
 
-  async componentDidMount(){
+  async fetchMovies(){
 
-    // window.setInterval((): void=>{
-    //   // this.forceUpdate(); 
-    // }, 5000)
+    
+    console.log("sleeping"); 
+    await this.sleep(1000); 
+
+    console.log("fetching api movie data"); 
 
 
     let movies: MovieDataSectionsByLetter = await getFacebookMoviesApiRequest(); 
+
+    console.log("finished movies api request"); 
+
+    this.setState({
+      isFetchingFilmsFromAPI: false
+    })
 
     let sectionsListDataArr: movieSectionsShapeForSectionList[] = []; 
 
@@ -96,6 +115,15 @@ export default class App extends React.Component<Props, State> {
         movieSections: sectionsListDataArr
       }
     )  
+  }
+
+  // private _onPressButton(e: GestureResponderEvent) {
+  //   Alert.alert("you tapped on button");   
+  // }
+
+  async componentDidMount(){
+    console.log("hello"); 
+    await this.fetchMovies(); 
   }   
 
 
@@ -122,7 +150,17 @@ export default class App extends React.Component<Props, State> {
       <View>
         {/* wrap custom component into js component class wrapper for type(props) inference with typescript */ }
         <View style={{ height:105, flexDirection: "row", backgroundColor: this.state.orientation === "portrait" ? "red" : "green"}}>
-          <RCTCustomApiRequestComponent shouldScan={true} style={{flex: 1}}/>
+          <CustomApiLoaderVisual 
+            shouldScan={this.state.isFetchingFilmsFromAPI} 
+            colourHex={this.state.orientation === "portrait" ? "#4433ba" : "#a48ae9"} 
+            width={this.state.orientation === "portrait" ? this.state.screenWidth : this.state.screenHeight}
+            messageToUser={this.state.isFetchingFilmsFromAPI ? "fetching movie data..." : "have received movie data..."}
+            onTouchEnd={async () => {
+              // console.log("clicked")
+              await this.setState({isFetchingFilmsFromAPI: true}); 
+              await this.fetchMovies(); 
+            }}
+          /> 
         </View>
         <Text> my movies </Text>
         {moviesList}

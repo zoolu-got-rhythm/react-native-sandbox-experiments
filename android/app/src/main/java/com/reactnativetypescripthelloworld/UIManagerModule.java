@@ -63,6 +63,8 @@ public class UIManagerModule extends ReactContextBaseJavaModule {
             WritableMap layoutDimsInPixels = this.getScreenDimentionsInPixels();
             layoutDimsInPixels.putInt("relativeX", 0);
             layoutDimsInPixels.putInt("relativeY", 0);
+            layoutDimsInPixels.putInt("width", (int) PixelUtil.toDIPFromPixel(layoutDimsInPixels.getInt("width")));
+            layoutDimsInPixels.putInt("height", (int) PixelUtil.toDIPFromPixel(layoutDimsInPixels.getInt("height")));
             promise.resolve(layoutDimsInPixels);
         }catch (IllegalViewOperationException e){
             promise.reject(E_LAYOUT_ERROR_PROMISE, e);
