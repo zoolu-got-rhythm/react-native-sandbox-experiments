@@ -122,7 +122,8 @@ export class FilmItemComponent extends React.Component<Props> {
                         <Text style={styles.movieReleaseYear}> {this.props.moviePojo.releaseYear} </Text>
 
                         </View> 
-                        <ScrollView style={{backgroundColor: "#11111190", alignSelf: "baseline", padding: 5, marginTop: 5, marginRight: 10, marginBottom: 10, maxHeight: 65}}> 
+                        <ScrollView style={{backgroundColor: "#11111190", alignSelf: "baseline", padding: 5, 
+                            marginTop: 5, marginRight: 10, marginBottom: 10, maxHeight: 65}}> 
                             <Text style={styles.movieReleaseYear}> {(this.props.moviePojo.movieDescription as string).substring(0, 250)} </Text>
 
                             </ScrollView>
